@@ -1,5 +1,7 @@
 # TypeScript code generator for ImmutableJS
 
+[![Join the chat at https://gitter.im/s-panferov/tsimmutable](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/s-panferov/tsimmutable?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Codegen all you need to use ImmutableJS in your TypeScript application. Also
 uses type information to emit functions to parse **nested** Records.
 
