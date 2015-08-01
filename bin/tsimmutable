@@ -15,8 +15,6 @@ var usage = '' +
     '--emitEmptyRecords  Shoud emitter emit empty default records? Default: false' + '\n' +
     '--defaultEmptyType  Emit empty records with fields initializer by this value. Default: "null"' + '\n'
 
-console.log(argv)
-
 if (!argv._.length) {
     console.log(usage);
     process.exit(1);
