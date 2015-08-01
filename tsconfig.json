@@ -21,9 +21,10 @@
     ],
     "files": [
         "./index.ts",
-        "./test/index.ts",
+        "./test/default-records.ts",
         "./test/models-imm.ts",
         "./test/models.ts",
+        "./test/self-created-records.ts",
         "./typings/lodash/lodash.d.ts",
         "./typings/node/node.d.ts",
         "./typings/tsd.d.ts"

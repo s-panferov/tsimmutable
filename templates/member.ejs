@@ -1,2 +1,5 @@
-get(key: '<%= member.name.text %>', defaultValue?: <%= this.typeMap(member) %>): <%= this.typeMap(member) %>
-set(key: '<%= member.name.text %>', value: <%= this.typeMap(member) %>): <%= iface.name.text %>Map
+<% if (emitRecords) { -%>
+    <%= member.name.text %><%= member.questionToken ? '?' : '' %>: <%- this.typeMap(member) %>
+<% } -%>
+get(key: '<%= member.name.text %>', defaultValue?: <%- this.typeMap(member) %>): <%- this.typeMap(member) %>
+set(key: '<%= member.name.text %>', value: <%- this.typeMap(member) %>): <%= iface.name.text %>Map

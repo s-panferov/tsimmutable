@@ -1,9 +1,10 @@
-export interface UserName {
+export interface Profile {
     firstName: string;
     lastName: string;
 }
 
 export interface User {
-    name: UserName;
-    password: string;
+    profile: Profile;
+    login: string;
+    friends?: User[];
 }

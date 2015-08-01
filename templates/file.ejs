@@ -35,6 +35,13 @@ function isPlainObj(value) {
     return value && (value.constructor === Object || value.constructor === undefined);
 }
 
-<% ifaces.forEach(function(iface) { %>
+<% ifaces.forEach(function(iface) { -%>
     <%- include('interface', { iface: iface, ifaceName: iface.name.text }) %>
-<% }) %>
+<% }) -%>
+<% if (emitRecords && emitEmptyRecords) { -%>
+    export let allRecords = {
+        <% ifaces.forEach(function(iface) { -%>
+            <%= iface.name.text %>Record,
+        <% }) -%>
+    }
+<% } -%>

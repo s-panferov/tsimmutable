@@ -13,7 +13,6 @@ export function walker(sourceFile: ts.SourceFile) {
     let walk = (node: ts.Node) => {
         switch (node.kind) {
             case ts.SyntaxKind.InterfaceDeclaration:
-                console.log(JSON.stringify(node, null, 4))
                 interfaces.push(node);
         }
 
@@ -25,13 +24,18 @@ export function walker(sourceFile: ts.SourceFile) {
 }
 
 export function codegen(iface: ts.InterfaceDeclaration) {
-    console.log(iface)
-
     ejs.render(readFileSync('templates/file'), {})
 }
 
-const fileNames = process.argv.slice(2);
-fileNames.forEach(fileName => {
+export interface ExternalOptions {
+    indexerType?: string,
+    emitRecords?: boolean,
+    emitMarkers?: boolean,
+    emitEmptyRecords?: boolean,
+    defaultEmptyType?: string
+}
+
+export function generate(fileName: string, extOptions: ExternalOptions) {
     // Parse a file
     let sourceFile = ts.createSourceFile(
         fileName,
@@ -44,6 +48,18 @@ fileNames.forEach(fileName => {
     let template = readFileSync('./templates/file.ejs').toString();
     let importName = path.basename(fileName.replace(/.tsx?$/, ''));
 
+    let options = {
+        ifaces: ifaces,
+        importName: importName,
+        indexerType: 'any',
+        emitRecords: false,
+        emitMarkers: false,
+        emitEmptyRecords: false,
+        defaultEmptyType: 'null'
+    };
+
+    _.assign(options, extOptions);
+
     let functions = {
         type: (member) => {
             return sourceFile.text.slice(member.type.pos + 1, member.type.end)
@@ -51,12 +67,24 @@ fileNames.forEach(fileName => {
         isLocalType(typeName: string) {
             return  _.any(ifaces, (iface) => iface.name.text == typeName);
         },
+        isArrayType(typeName: string) {
+            return typeName.indexOf('[]') !== -1;
+        },
+        sanitizeTypeName(typeName: string) {
+            return typeName.replace(/\[\]$/, '')
+        },
         typeMap: (member) => {
             let typeName = functions.type(member);
-            let isLocalType = functions.isLocalType(typeName);
+            let sanitizedTypeName = functions.sanitizeTypeName(typeName);
+            let isArrayType = functions.isArrayType(typeName);
+            let isLocalType = functions.isLocalType(sanitizedTypeName);
 
             if (isLocalType) {
-                return `${typeName}Map`
+                if (isArrayType) {
+                    return `Immutable.List<${sanitizedTypeName}Map>`
+                } else {
+                    return `${typeName}Map`
+                }
             } else {
                 return typeName
             }
@@ -65,11 +93,12 @@ fileNames.forEach(fileName => {
             let iface = _.find(ifaces, (iface) => iface.name.text == ifaceName);
             iface.members.forEach((member) => {
                 let memberTypeName = functions.type(member);
-                let isVisited = acc[memberTypeName];
+                let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
+                let isVisited = acc[sanitizedTypeName];
                 if (!isVisited) {
-                    if (functions.isLocalType(memberTypeName)) {
-                        acc[memberTypeName] = true
-                        functions.deps(memberTypeName, acc);
+                    if (functions.isLocalType(sanitizedTypeName)) {
+                        acc[sanitizedTypeName] = true
+                        functions.deps(sanitizedTypeName, acc);
                     }
                 }
             });
@@ -81,33 +110,44 @@ fileNames.forEach(fileName => {
             let iface = _.find(ifaces, (iface) => iface.name.text == ifaceName);
             iface.members.forEach((member) => {
                 let memberTypeName = functions.type(member);
-                if (functions.isLocalType(memberTypeName)) {
+                let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
+                if (functions.isLocalType(sanitizedTypeName)) {
                     acc[member.name.text] = memberTypeName
                 }
             });
 
             return acc
         },
+        initializer: (member) => {
+            let typeName = functions.type(member);
+            let sanitizedTypeName = functions.sanitizeTypeName(typeName);
+            let isArrayType = functions.isArrayType(typeName);
+            let isLocalType = functions.isLocalType(sanitizedTypeName);
+
+            if (isLocalType) {
+                if (isArrayType) {
+                    return `Immutable.List<${sanitizedTypeName}Map>()`
+                } else {
+                    return `new ${typeName}Record()`
+                }
+            } else {
+                return options.defaultEmptyType;
+            }
+        },
         forEach: _.forEach
     }
 
     let result = ejs.render(
         template,
-        {
-            ifaces: ifaces,
-            importName: importName,
-            indexerType: 'void',
-            isRecordsReady: true,
-            emitMarkers: true
-        },
+        options,
         {
             filename: './templates/file.ejs',
             context: functions
         }
     );
 
-    writeFileSync(fileName.replace(/.tsx?$/, '-imm.ts'), format(result))
-});
+    return format(result);
+}
 
 // Note: this uses ts.formatting which is part of the typescript 1.4 package but is not currently
 //       exposed in the public typescript.d.ts. The typings should be exposed in the next release.

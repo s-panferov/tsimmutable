@@ -1,0 +1,31 @@
+#!/usr/bin/env node
+var generate = require('../index').generate;
+var argv = require('minimist')(process.argv.slice(2));
+var writeFileSync = require('fs').writeFileSync;
+var pkg = require('../package.json');
+var usage = '' +
+    'Version: ' + pkg.version + '\n' +
+    'Syntax: tsimmutable [options] [file ...]' + '\n' +
+    '\n' +
+    'Options:' + '\n' +
+    '--out               Output file name. Default: stdout' + '\n' +
+    '--indexerType       Emit map with Map<string, $indexerType> type. Default: "any"' + '\n' +
+    '--emitRecords       Shoud emitter emit records? Default: false' + '\n' +
+    '--emitMarkers       Shoud emitter emit type markers? Default: false' + '\n' +
+    '--emitEmptyRecords  Shoud emitter emit empty default records? Default: false' + '\n' +
+    '--defaultEmptyType  Emit empty records with fields initializer by this value. Default: "null"' + '\n'
+
+console.log(argv)
+
+if (!argv._.length) {
+    console.log(usage);
+    process.exit(1);
+}
+
+var result = argv._.map(function(fileName) { return generate(fileName, argv); }).join('\n');
+
+if (argv.out) {
+    writeFileSync(argv.out, result)
+} else {
+    process.stdout.write(result);
+}

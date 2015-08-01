@@ -1,7 +1,7 @@
 /**
  * Map interface for <%= ifaceName %> with specialized getters and setters.
  */
-export interface <%= ifaceName %>Map extends <% if (isRecordsReady) { %><%= ifaceName %>, <% } %>Immutable.Map<string, <%= indexerType %>> {
+export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerType %>> {
     <% if (emitMarkers) { -%>
         <%= ifaceName %>Map: <%= ifaceName %>Map
     <% } -%>
@@ -12,14 +12,14 @@ export interface <%= ifaceName %>Map extends <% if (isRecordsReady) { %><%= ifac
     get(key: string, defaultValue?: any): <%= indexerType %>;
     set(key: string, value: typeof undefined): <%= ifaceName %>Map;
 }
-<% if (isRecordsReady) { -%>
+<% if (emitRecords) { -%>
 
     /**
      * Default fields that must be provided in <%= ifaceName %>Record.
      */
     export interface <%= ifaceName %>RecordDefaults {
         <% iface.members.forEach(function(member) { -%>
-            <%= member.name.text %>: <%= this.type(member) %>
+            <%= member.name.text %>: <%- this.typeMap(member) %>
         <% }.bind(this)) -%>
     }
 
@@ -45,7 +45,13 @@ export interface <%= ifaceName %>Map extends <% if (isRecordsReady) { %><%= ifac
             switch(true) {
                 <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
                     case key == '<%= depFieldName %>':
-                       return parse<%= depType %>Record(value, deps);
+                       <% if (this.isArrayType(depType)) { -%>
+                            return Immutable.List(value.map((item) => {
+                                return parse<%= this.sanitizeTypeName(depType) %>Record(item, deps);
+                            }));
+                       <%} else {-%>
+                            return parse<%= depType %>Record(value, deps);
+                       <% } -%>
                 <% }.bind(this)) %>
                 default: return fromJSDefault(value);
             }
@@ -60,4 +66,10 @@ export interface <%= ifaceName %>Map extends <% if (isRecordsReady) { %><%= ifac
 
         return new deps.<%= ifaceName %>Record(result);
     }
+
+    export class <%= ifaceName %>Record extends <%= ifaceName %>RecordCtor({
+        <% iface.members.forEach(function(member) { -%>
+            <%= member.name.text %>: <%- this.initializer(member) %>,
+        <% }.bind(this)) -%>
+    }) { }
 <% } -%>
