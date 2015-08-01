@@ -18,9 +18,7 @@ export interface RecordClass<T extends Immutable.Map<string, void>> {
 }
 
 export interface RecordCtor<R, T extends Immutable.Map<string, any>> {
-    (
-        defaultValues: T | R, name?: string
-    ): RecordClass<T>
+    (defaultValues: T | R, name?: string): RecordClass<T>
 }
 
 function fromJSDefault(json) {
@@ -38,5 +36,5 @@ function isPlainObj(value) {
 }
 
 <% ifaces.forEach(function(iface) { %>
-    <%- include('interface', { iface: iface }) %>
+    <%- include('interface', { iface: iface, ifaceName: iface.name.text }) %>
 <% }) %>

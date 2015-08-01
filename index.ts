@@ -97,7 +97,8 @@ fileNames.forEach(fileName => {
             ifaces: ifaces,
             importName: importName,
             indexerType: 'void',
-            isRecordsReady: true
+            isRecordsReady: true,
+            emitMarkers: true
         },
         {
             filename: './templates/file.ejs',
