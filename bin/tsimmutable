@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 var generate = require('../index').generate;
 var argv = require('minimist')(process.argv.slice(2));
-var writeFileSync = require('fs').writeFileSync;
+var fs = require('fs');
 var pkg = require('../package.json');
 var usage = '' +
     'Version: ' + pkg.version + '\n' +
@@ -20,10 +20,10 @@ if (!argv._.length) {
     process.exit(1);
 }
 
-var result = argv._.map(function(fileName) { return generate(fileName, argv); }).join('\n');
+var result = argv._.map(function(fileName) { return generate(fileName, fs.readFileSync(fileName), argv); }).join('\n');
 
 if (argv.out) {
-    writeFileSync(argv.out, result)
+    fs.writeFileSync(argv.out, result)
 } else {
     process.stdout.write(result);
 }

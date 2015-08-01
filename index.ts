@@ -1,10 +1,10 @@
 /// <reference path="./typings/tsd.d.ts" />
 /// <reference path="./node_modules/typescript/lib/typescript.d.ts" />
 
-import {readFileSync, writeFileSync} from "fs";
 import * as ts from "typescript";
 import * as path from "path";
 import * as _ from 'lodash';
+import { readFileSync } from 'fs';
 
 var ejs = require('ejs');
 
@@ -35,11 +35,11 @@ export interface ExternalOptions {
     defaultEmptyType?: string
 }
 
-export function generate(fileName: string, extOptions: ExternalOptions) {
+export function generate(fileName: string, text: string, extOptions: ExternalOptions) {
     // Parse a file
     let sourceFile = ts.createSourceFile(
         fileName,
-        readFileSync(fileName).toString(),
+        text.toString(),
         ts.ScriptTarget.ES6,
         false
     );
