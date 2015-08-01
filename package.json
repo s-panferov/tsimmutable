@@ -1,0 +1,17 @@
+{
+  "name": "tsimmutable",
+  "version": "0.1.0",
+  "description": "TypeScript code generator for ImmutableJS",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Stanislav Panferov <fnight.m@gmail.com",
+  "license": "MIT",
+  "devDependencies": {
+    "ejs": "^2.3.3",
+    "immutable": "^3.7.4",
+    "lodash": "^3.10.0",
+    "typescript": "^1.6.0-dev.20150801"
+  }
+}

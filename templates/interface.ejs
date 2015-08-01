@@ -1,0 +1,51 @@
+export interface <%= iface.name.text %>Map extends <% if (isRecordsReady) { %><%= iface.name.text %>, <% } %>Immutable.Map<string, <%= indexerType %>> {
+    <% iface.members.forEach(function(member) { %>
+        <%- include('member', { iface: iface, member: member }) %>
+    <% }) -%>
+
+    get(key: string, defaultValue?: any): <%= indexerType %>;
+    set(key: string, value: typeof undefined): <%= iface.name.text %>Map;
+}
+
+<% if (isRecordsReady) { %>
+
+export interface <%= iface.name.text %>RecordDefaults {
+    <% iface.members.forEach(function(member) { -%>
+        <%= member.name.text %>: <%= this.type(member) %>
+    <% }.bind(this)) -%>
+}
+
+export let <%= iface.name.text %>RecordCtor: RecordCtor<<%= iface.name.text %>RecordDefaults, <%= iface.name.text %>Map> = Immutable.Record as any;
+
+<% var deps = this.deps(iface.name.text); %>
+
+export interface <%= iface.name.text %>RecordDeps {
+    <% deps.forEach(function(dep) { %>
+       <%= dep %>Record: RecordClass<<%= dep %>Map>
+    <% }.bind(this)) %>
+}
+
+export function parse<%= iface.name.text %>Record(value: <%= iface.name.text %>, deps: <%= iface.name.text %>RecordDeps): <%= iface.name.text %>Map {
+    var recordWalker = function(value, key) {
+        if (false) { }
+        <% this.forEach(this.ownDeps(iface.name.text), function(depType, depFieldName) { %>
+            else if (key == '<%= depFieldName %>') {
+               return parse<%= depType %>Record(value, deps);
+            }
+        <% }.bind(this)) %>
+        else {
+            return fromJSDefault(value);
+        }
+    };
+
+    var result: any = {};
+    for (var k in value) {
+        if (value.hasOwnProperty) {
+            result[k] = recordWalker(value[k], k);
+        }
+    }
+
+    return new deps.<%= iface.name.text %>Record(result);
+}
+
+<% } %>
