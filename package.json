@@ -4,7 +4,8 @@
   "description": "TypeScript code generator for ImmutableJS",
   "main": "dist/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "grunt": "grunt",
+    "prepublish": "grunt"
   },
   "author": "Stanislav Panferov <fnight.m@gmail.com",
   "license": "MIT",

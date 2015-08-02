@@ -1,6 +1,4 @@
 .tscache
 node_modules
-dist
-!/dist
 test
 tscommand

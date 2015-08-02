@@ -1,5 +1,5 @@
 {
-    "version": "1.5.3",
+    "version": "1.5.0-beta",
     "compilerOptions": {
         "target": "es5",
         "module": "commonjs",
@@ -12,23 +12,19 @@
         "removeComments": true,
         "noLib": false,
         "preserveConstEnums": true,
-        "suppressImplicitAnyIndexErrors": true
+        "suppressImplicitAnyIndexErrors": true,
+        "outDir": "./out"
     },
-    "compileOnSave": false,
+    "compileOnSave": true,
     "filesGlob": [
         "./**/*.ts",
         "./**/*.tsx",
         "!./node_modules/**/*"
     ],
     "files": [
-        "./src/formatter.ts",
-        "./src/index.ts",
-        "./test/default-records.ts",
-        "./test/models-imm.ts",
-        "./test/models.ts",
-        "./test/self-created-records.ts",
-        "./typings/lodash/lodash.d.ts",
-        "./typings/node/node.d.ts",
-        "./typings/tsd.d.ts"
+        "./default-records.ts",
+        "./models-imm.ts",
+        "./models.ts",
+        "./self-created-records.ts"
     ]
 }

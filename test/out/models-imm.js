@@ -69,7 +69,7 @@ var ProfileRecord = (function (_super) {
 })(exports.ProfileRecordCtor({
     firstName: null,
     lastName: null,
-    avatar: new AvatarRecord(),
+    avatar: null,
 }));
 exports.ProfileRecord = ProfileRecord;
 exports.UserRecordCtor = Immutable.Record;

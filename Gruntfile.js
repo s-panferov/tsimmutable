@@ -69,4 +69,6 @@ module.exports = function(grunt) {
             'bump-commit'
         );
     });
+
+    grunt.registerTask('default', ['ts']);
 };
