@@ -14,13 +14,15 @@
         "preserveConstEnums": true,
         "suppressImplicitAnyIndexErrors": true
     },
+    "compileOnSave": false,
     "filesGlob": [
         "./**/*.ts",
         "./**/*.tsx",
         "!./node_modules/**/*"
     ],
     "files": [
-        "./index.ts",
+        "./src/formatter.ts",
+        "./src/index.ts",
         "./test/default-records.ts",
         "./test/models-imm.ts",
         "./test/models.ts",

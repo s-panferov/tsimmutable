@@ -1,9 +1,20 @@
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../node_modules/typescript/lib/typescript.d.ts" />
+/// <reference path="../node_modules/immutable/dist/immutable.d.ts"/>
+
 import * as models from './models-imm';
 import * as Immutable from 'immutable';
 
+export class AvatarRecord extends models.AvatarRecordCtor({
+    src: null,
+}) {
+
+}
+
 export class ProfileRecord extends models.ProfileRecordCtor({
     firstName: null,
-    lastName: null
+    lastName: null,
+    avatar: null
 }) {
 
 }
@@ -18,7 +29,8 @@ export class UserRecord extends models.UserRecordCtor({
 
 let allRecords = {
     UserRecord,
-    ProfileRecord
+    ProfileRecord,
+    AvatarRecord
 }
 
 let user = models.parseUserRecord({

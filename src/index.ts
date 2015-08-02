@@ -1,10 +1,12 @@
-/// <reference path="./typings/tsd.d.ts" />
-/// <reference path="./node_modules/typescript/lib/typescript.d.ts" />
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../node_modules/typescript/lib/typescript.d.ts" />
+/// <reference path="../node_modules/immutable/dist/immutable.d.ts"/>
 
 import * as ts from "typescript";
 import * as path from "path";
 import * as _ from 'lodash';
 import { readFileSync } from 'fs';
+import { format } from './formatter';
 
 var ejs = require('ejs');
 
@@ -45,7 +47,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
     );
 
     let ifaces = walker(sourceFile);
-    let template = readFileSync('./templates/file.ejs').toString();
+    let template = readFileSync(path.join(__dirname, '../templates/file.ejs')).toString();
     let importName = path.basename(fileName.replace(/.tsx?$/, ''));
 
     let options = {
@@ -126,9 +128,11 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
 
             if (isLocalType) {
                 if (isArrayType) {
-                    return `Immutable.List<${sanitizedTypeName}Map>()`
+                    return `Immutable.List<${sanitizedTypeName}Map>()`;
+                } else if (!member.questionToken) {
+                    return `new ${typeName}Record()`;
                 } else {
-                    return `new ${typeName}Record()`
+                    return options.defaultEmptyType;
                 }
             } else {
                 return options.defaultEmptyType;
@@ -147,56 +151,4 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
     );
 
     return format(result);
-}
-
-// Note: this uses ts.formatting which is part of the typescript 1.4 package but is not currently
-//       exposed in the public typescript.d.ts. The typings should be exposed in the next release.
-function format(text: string) {
-    let options = getDefaultOptions();
-
-    // Parse the source text
-    let sourceFile = ts.createSourceFile("file.ts", text, ts.ScriptTarget.Latest, /*setParentPointers*/ true);
-
-    // Get the formatting edits on the input sources
-    let edits = (<any>ts).formatting.formatDocument(sourceFile, getRuleProvider(options), options);
-
-    // Apply the edits on the input code
-    return applyEdits(text, edits);
-
-    function getRuleProvider(options: ts.FormatCodeOptions) {
-        // Share this between multiple formatters using the same options.
-        // This represents the bulk of the space the formatter uses.
-        let ruleProvider = new (<any>ts).formatting.RulesProvider();
-        ruleProvider.ensureUpToDate(options);
-        return ruleProvider;
-    }
-
-    function applyEdits(text: string, edits: ts.TextChange[]): string {
-        // Apply edits in reverse on the existing text
-        let result = text;
-        for (let i = edits.length - 1; i >= 0; i--) {
-            let change = edits[i];
-            let head = result.slice(0, change.span.start);
-            let tail = result.slice(change.span.start + change.span.length)
-            result = head + change.newText + tail;
-        }
-        return result;
-    }
-
-    function getDefaultOptions(): ts.FormatCodeOptions {
-        return {
-            IndentSize: 4,
-            TabSize: 4,
-            NewLineCharacter: '\r\n',
-            ConvertTabsToSpaces: true,
-            InsertSpaceAfterCommaDelimiter: true,
-            InsertSpaceAfterSemicolonInForStatements: true,
-            InsertSpaceBeforeAndAfterBinaryOperators: true,
-            InsertSpaceAfterKeywordsInControlFlowStatements: true,
-            InsertSpaceAfterFunctionKeywordForAnonymousFunctions: false,
-            InsertSpaceAfterOpeningAndBeforeClosingNonemptyParenthesis: false,
-            PlaceOpenBraceOnNewLineForFunctions: false,
-            PlaceOpenBraceOnNewLineForControlBlocks: false,
-        };
-    }
 }

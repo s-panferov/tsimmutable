@@ -1,11 +1,13 @@
 import * as Immutable from 'immutable';
 
 import {
+Avatar,
 Profile,
 User,
 } from './models';
 
 export {
+Avatar,
 Profile,
 User,
 };
@@ -34,6 +36,64 @@ function isPlainObj(value) {
 }
 
 /**
+* Map interface for Avatar with specialized getters and setters.
+*/
+export interface AvatarMap extends Immutable.Map<string, void> {
+    AvatarMap: AvatarMap
+
+    src: string
+    get(key: 'src', defaultValue?: string): string
+    set(key: 'src', value: string): AvatarMap
+
+    get(key: string, defaultValue?: any): void;
+    set(key: string, value: typeof undefined): AvatarMap;
+}
+
+/**
+ * Default fields that must be provided in AvatarRecord.
+ */
+export interface AvatarRecordDefaults {
+    src: string
+}
+
+/**
+ * Typed AvatarRecord constructor.
+ */
+export let AvatarRecordCtor: RecordCtor<AvatarRecordDefaults, AvatarMap> = Immutable.Record as any;
+
+/**
+ * AvatarRecord dependencies
+ */
+export interface AvatarRecordDeps {
+    AvatarRecord: RecordClass<AvatarMap>
+}
+
+/**
+ * Special method to parse AvatarRecord with all the dependencies.
+ */
+export function parseAvatarRecord(value: Avatar, deps: AvatarRecordDeps): AvatarMap {
+    var recordWalker = function(value, key) {
+        switch (true) {
+
+            default: return fromJSDefault(value);
+        }
+    };
+
+    var result: any = {};
+    for (var k in value) {
+        if (value.hasOwnProperty) {
+            result[k] = recordWalker(value[k], k);
+        }
+    }
+
+    return new deps.AvatarRecord(result);
+}
+
+export class AvatarRecord extends AvatarRecordCtor({
+    src: null,
+}) { }
+
+/**
 * Map interface for Profile with specialized getters and setters.
 */
 export interface ProfileMap extends Immutable.Map<string, void> {
@@ -47,6 +107,10 @@ export interface ProfileMap extends Immutable.Map<string, void> {
     get(key: 'lastName', defaultValue?: string): string
     set(key: 'lastName', value: string): ProfileMap
 
+    avatar?: AvatarMap
+    get(key: 'avatar', defaultValue?: AvatarMap): AvatarMap
+    set(key: 'avatar', value: AvatarMap): ProfileMap
+
     get(key: string, defaultValue?: any): void;
     set(key: string, value: typeof undefined): ProfileMap;
 }
@@ -57,6 +121,7 @@ export interface ProfileMap extends Immutable.Map<string, void> {
 export interface ProfileRecordDefaults {
     firstName: string
     lastName: string
+    avatar: AvatarMap
 }
 
 /**
@@ -68,6 +133,7 @@ export let ProfileRecordCtor: RecordCtor<ProfileRecordDefaults, ProfileMap> = Im
  * ProfileRecord dependencies
  */
 export interface ProfileRecordDeps {
+    AvatarRecord: RecordClass<AvatarMap>
     ProfileRecord: RecordClass<ProfileMap>
 }
 
@@ -77,6 +143,9 @@ export interface ProfileRecordDeps {
 export function parseProfileRecord(value: Profile, deps: ProfileRecordDeps): ProfileMap {
     var recordWalker = function(value, key) {
         switch (true) {
+
+            case key == 'avatar':
+                return parseAvatarRecord(value, deps);
 
             default: return fromJSDefault(value);
         }
@@ -95,6 +164,7 @@ export function parseProfileRecord(value: Profile, deps: ProfileRecordDeps): Pro
 export class ProfileRecord extends ProfileRecordCtor({
     firstName: null,
     lastName: null,
+    avatar: null,
 }) { }
 
 /**
@@ -138,6 +208,7 @@ export let UserRecordCtor: RecordCtor<UserRecordDefaults, UserMap> = Immutable.R
  */
 export interface UserRecordDeps {
     ProfileRecord: RecordClass<ProfileMap>
+    AvatarRecord: RecordClass<AvatarMap>
     UserRecord: RecordClass<UserMap>
 }
 
@@ -177,6 +248,7 @@ export class UserRecord extends UserRecordCtor({
 }) { }
 
 export let allRecords = {
+    AvatarRecord,
     ProfileRecord,
     UserRecord,
 }

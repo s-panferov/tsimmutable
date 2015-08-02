@@ -1,5 +1,8 @@
-import { parseUserRecord, allRecords }  from './models-imm';
+/// <reference path="../typings/tsd.d.ts" />
+/// <reference path="../node_modules/typescript/lib/typescript.d.ts" />
+/// <reference path="../node_modules/immutable/dist/immutable.d.ts"/>
 
+import { parseUserRecord, allRecords }  from './models-imm';
 import * as Immutable from 'immutable';
 
 let user = parseUserRecord({
