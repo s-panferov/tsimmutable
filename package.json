@@ -3,6 +3,22 @@
   "version": "0.2.2",
   "description": "TypeScript code generator for ImmutableJS",
   "main": "dist/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/s-panferov/tsimmutable.git"
+  },
+  "license": "MIT",
+  "keywords": [
+    "webpack",
+    "immutable",
+    "datastructure",
+    "react",
+    "typescript"
+  ],
+  "bugs": {
+    "url": "https://github.com/s-panferov/tsimmutable/issues"
+  },
+  "homepage": "https://github.com/s-panferov/tsimmutable",
   "bin": {
     "tsimmutable": "./bin/tsimmutable"
   },
