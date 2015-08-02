@@ -25,10 +25,6 @@ export function walker(sourceFile: ts.SourceFile) {
     return interfaces;
 }
 
-export function codegen(iface: ts.InterfaceDeclaration) {
-    ejs.render(readFileSync('templates/file'), {})
-}
-
 export interface ExternalOptions {
     indexerType?: string,
     emitRecords?: boolean,
@@ -46,8 +42,9 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         false
     );
 
+    let templatesFolder = path.join(__dirname, '../templates');
     let ifaces = walker(sourceFile);
-    let template = readFileSync(path.join(__dirname, '../templates/file.ejs')).toString();
+    let template = readFileSync(path.join(templatesFolder, 'file.ejs')).toString();
     let importName = path.basename(fileName.replace(/.tsx?$/, ''));
 
     let options = {
@@ -145,7 +142,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         template,
         options,
         {
-            filename: './templates/file.ejs',
+            filename: path.join(templatesFolder, 'file.ejs'),
             context: functions
         }
     );

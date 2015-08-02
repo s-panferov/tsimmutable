@@ -3,6 +3,9 @@
   "version": "0.2.0",
   "description": "TypeScript code generator for ImmutableJS",
   "main": "dist/index.js",
+  "bin": {
+    "tsimmutable": "./bin/tsimmutable"
+  },
   "scripts": {
     "grunt": "grunt",
     "prepublish": "grunt"
