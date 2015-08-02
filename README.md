@@ -56,6 +56,57 @@ import { generate } from 'tsimmutable';
 let result = generate(fileName, fileText, options);
 ```
 
+## Webpack plugin
+
+`tsimmutable` goes together with [webpack](http://webpack.github.io/) plugin which
+helps to watch and re-generate your model files when initial interface files change.
+
+Usage:
+
+```
+var TsImmutablePlugin = require('tsimmutable/plugin');
+
+module.exports = {
+    resolve: {
+        extensions: ['', '.ts', '.js']
+    },
+    module: {
+        loaders: [
+            {
+                test: /\.ts$/,
+                loader: 'awesome-typescript-loader?module=common'
+            }
+        ]
+    },
+    entry: {
+        index: ['./index.ts']
+    },
+    output: {
+        path: './dist',
+        filename: './[name].js'
+    },
+    plugins: [
+        new TsImmutablePlugin({
+            files: [
+                './models.ts'
+            ],
+
+            /*
+             * Every option below is optional.
+             */
+
+            suffix: '-i',
+            verbose: true,
+            indexerType: 'any',
+            emitRecords: true,
+            emitMarkers: true,
+            emitEmptyRecords: true,
+            defaultEmptyType: 'null'
+        })
+    ]
+};
+```
+
 ## Limitations
 
 1. Inline object types will not work:

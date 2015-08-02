@@ -25,6 +25,9 @@
         "./default-records.ts",
         "./models-imm.ts",
         "./models.ts",
-        "./self-created-records.ts"
+        "./self-created-records.ts",
+        "./webpack-proj/index.ts",
+        "./webpack-proj/models-i.ts",
+        "./webpack-proj/models.ts"
     ]
 }

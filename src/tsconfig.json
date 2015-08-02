@@ -23,6 +23,7 @@
     ],
     "files": [
         "./formatter.ts",
-        "./index.ts"
+        "./index.ts",
+        "./plugin.ts"
     ]
 }
