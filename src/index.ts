@@ -146,8 +146,6 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                     let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
                     if (!functions.isLocalType(sanitizedTypeName)) {
                         let internalTypes = functions.extractTypes(memberTypeName);
-                        console.log(memberTypeName, internalTypes)
-
                         internalTypes.forEach(type => deps[type] = true)
                     }
                 });
