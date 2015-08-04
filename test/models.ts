@@ -1,3 +1,8 @@
+export enum UserType {
+    Payed = 'payed' as any,
+    Guest = 'payed' as any
+}
+
 export interface Avatar {
     src: string;
 }
@@ -12,4 +17,5 @@ export interface User {
     profile: Profile;
     login: string;
     friends?: User[];
+    type: UserType
 }

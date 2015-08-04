@@ -54,7 +54,8 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         emitRecords: false,
         emitMarkers: false,
         emitEmptyRecords: false,
-        defaultEmptyType: 'null'
+        defaultEmptyType: 'null',
+        exportDeps: []
     };
 
     _.assign(options, extOptions);
@@ -135,8 +136,40 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                 return options.defaultEmptyType;
             }
         },
+        exportDeps: (): string[] => {
+            let deps = {};
+
+            ifaces.forEach(iface => {
+                deps[iface.name.text] = true;
+                iface.members.forEach((member) => {
+                    let memberTypeName = functions.type(member);
+                    let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
+                    if (!functions.isLocalType(sanitizedTypeName)) {
+                        let internalTypes = functions.extractTypes(memberTypeName);
+                        console.log(memberTypeName, internalTypes)
+
+                        internalTypes.forEach(type => deps[type] = true)
+                    }
+                });
+            });
+
+            return Object.keys(deps);
+        },
+        extractTypes: (typeName: string): string[] => {
+            let types = typeName
+                // Extract all type names from the type
+                .match(/(?:[^a-z]|^)([A-Z]\w+)/g)
+
+            if (types) {
+                return types.map((type) => type.match(/[A-Z]\w+/)).map(s => s.toString())
+            } else {
+                return [];
+            }
+        },
         forEach: _.forEach
     }
+
+    options.exportDeps = functions.exportDeps();
 
     let result = ejs.render(
         template,

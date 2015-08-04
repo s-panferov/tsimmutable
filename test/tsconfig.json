@@ -23,7 +23,7 @@
     ],
     "files": [
         "./default-records.ts",
-        "./models-imm.ts",
+        "./models-i.ts",
         "./models.ts",
         "./self-created-records.ts",
         "./webpack-proj/index.ts",

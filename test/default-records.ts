@@ -2,7 +2,7 @@
 /// <reference path="../node_modules/typescript/lib/typescript.d.ts" />
 /// <reference path="../node_modules/immutable/dist/immutable.d.ts"/>
 
-import { parseUserRecord, allRecords }  from './models-imm';
+import { parseUserRecord, allRecords, UserType }  from './models-i';
 import * as Immutable from 'immutable';
 
 let user = parseUserRecord({
@@ -16,8 +16,10 @@ let user = parseUserRecord({
             firstName: 'Dart',
             lastName: 'Vader'
         },
-        login: 'vader1990'
-    }]
+        login: 'vader1990',
+        type: UserType.Payed
+    }],
+    type: UserType.Payed
 }, allRecords)
 
 console.log(`${user.profile.firstName} ${user.profile.lastName}`)

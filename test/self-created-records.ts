@@ -2,7 +2,7 @@
 /// <reference path="../node_modules/typescript/lib/typescript.d.ts" />
 /// <reference path="../node_modules/immutable/dist/immutable.d.ts"/>
 
-import * as models from './models-imm';
+import * as models from './models-i';
 import * as Immutable from 'immutable';
 
 export class AvatarRecord extends models.AvatarRecordCtor({
@@ -22,7 +22,8 @@ export class ProfileRecord extends models.ProfileRecordCtor({
 export class UserRecord extends models.UserRecordCtor({
     profile: new ProfileRecord(),
     login: null,
-    friends: Immutable.List<models.UserMap>()
+    friends: Immutable.List<models.UserMap>(),
+    type: models.UserType.Guest
 }) {
 
 }
@@ -39,12 +40,14 @@ let user = models.parseUserRecord({
         lastName: 'Skywalker'
     },
     login: 'anakin1990',
+    type: models.UserType.Payed,
     friends: [{
         profile: {
             firstName: 'Dart',
             lastName: 'Vader'
         },
-        login: 'vader1990'
+        login: 'vader1990',
+        type: models.UserType.Payed
     }]
 }, allRecords)
 

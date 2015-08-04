@@ -4,12 +4,14 @@ import {
 Avatar,
 Profile,
 User,
+UserType,
 } from './models';
 
 export {
 Avatar,
 Profile,
 User,
+UserType,
 };
 
 export interface RecordClass<T extends Immutable.Map<string, void>> {
@@ -185,6 +187,10 @@ export interface UserMap extends Immutable.Map<string, void> {
     get(key: 'friends', defaultValue?: Immutable.List<UserMap>): Immutable.List<UserMap>
     set(key: 'friends', value: Immutable.List<UserMap>): UserMap
 
+    type: UserType
+    get(key: 'type', defaultValue?: UserType): UserType
+    set(key: 'type', value: UserType): UserMap
+
     get(key: string, defaultValue?: any): void;
     set(key: string, value: typeof undefined): UserMap;
 }
@@ -196,6 +202,7 @@ export interface UserRecordDefaults {
     profile: ProfileMap
     login: string
     friends: Immutable.List<UserMap>
+    type: UserType
 }
 
 /**
@@ -245,6 +252,7 @@ export class UserRecord extends UserRecordCtor({
     profile: new ProfileRecord(),
     login: null,
     friends: Immutable.List<UserMap>(),
+    type: null,
 }) { }
 
 export let allRecords = {
