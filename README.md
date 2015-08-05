@@ -42,10 +42,12 @@ See the [output](https://github.com/s-panferov/tsimmutable/blob/master/test/mode
 
 ```
 --out               Output file name. Default: stdout
+--keyType           Emit map with Map<$keyType, ...> type. Default: "string"
 --indexerType       Emit map with Map<string, $indexerType> type. Default: "any"
 --emitRecords       Shoud emitter emit records? Default: false
 --emitMarkers       Shoud emitter emit type markers? Default: false
 --emitEmptyRecords  Shoud emitter emit empty default records? Default: false
+--emitTypedMethods  Shoud emitter emit typed methods? Default: false
 --defaultEmptyType  Emit empty records with fields initializer by this value. Default: "null"
 ```
 
@@ -101,6 +103,7 @@ module.exports = {
             emitRecords: true,
             emitMarkers: true,
             emitEmptyRecords: true,
+            emitTypedMethods: true,
             defaultEmptyType: 'null'
         })
     ]

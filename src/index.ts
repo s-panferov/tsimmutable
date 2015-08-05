@@ -12,17 +12,22 @@ var ejs = require('ejs');
 
 export function walker(sourceFile: ts.SourceFile) {
     let interfaces = [];
+    let imports = [];
     let walk = (node: ts.Node) => {
         switch (node.kind) {
             case ts.SyntaxKind.InterfaceDeclaration:
                 interfaces.push(node);
+                break;
+            case ts.SyntaxKind.ImportDeclaration:
+                imports.push(node);
+                break;
         }
 
         ts.forEachChild(node, walk);
     }
 
     walk(sourceFile);
-    return interfaces;
+    return [interfaces, imports];
 }
 
 export interface ExternalOptions {
@@ -43,17 +48,29 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
     );
 
     let templatesFolder = path.join(__dirname, '../templates');
-    let ifaces = walker(sourceFile);
+    let [ifaces, imports] = walker(sourceFile);
     let template = readFileSync(path.join(templatesFolder, 'file.ejs')).toString();
     let importName = path.basename(fileName.replace(/.tsx?$/, ''));
+
+    let flatImports = {};
+    imports.forEach((imp) => {
+        if (imp.importClause && imp.importClause.namedBindings) {
+            imp.importClause.namedBindings.elements.forEach(el => {
+                flatImports[el.name.text] = true;
+            })
+        }
+    })
 
     let options = {
         ifaces: ifaces,
         importName: importName,
+        flatImports,
+        keyType: "string",
         indexerType: 'any',
         emitRecords: false,
         emitMarkers: false,
         emitEmptyRecords: false,
+        emitTypedMethods: false,
         defaultEmptyType: 'null',
         exportDeps: []
     };
@@ -73,13 +90,22 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         sanitizeTypeName(typeName: string) {
             return typeName.replace(/\[\]$/, '')
         },
+        hasMapPairType(typeName: string): boolean {
+            return flatImports[typeName + 'Map'];
+        },
+        hasRecordPairType(typeName: string): boolean {
+            return flatImports[typeName + 'Record'];
+        },
+        getImportedImmutableTypes() {
+            return Object.keys(flatImports).filter(item => /^[A-Z].*Map$/.test(item)).map(item => item.replace(/Map$/, ''))
+        },
         typeMap: (member) => {
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
             let isArrayType = functions.isArrayType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
 
-            if (isLocalType) {
+            if (isLocalType || functions.hasMapPairType(sanitizedTypeName)) {
                 if (isArrayType) {
                     return `Immutable.List<${sanitizedTypeName}Map>`
                 } else {
@@ -111,7 +137,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             iface.members.forEach((member) => {
                 let memberTypeName = functions.type(member);
                 let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
-                if (functions.isLocalType(sanitizedTypeName)) {
+                if (functions.isLocalType(sanitizedTypeName) || functions.hasMapPairType(sanitizedTypeName)) {
                     acc[member.name.text] = memberTypeName
                 }
             });
@@ -146,7 +172,13 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                     let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
                     if (!functions.isLocalType(sanitizedTypeName)) {
                         let internalTypes = functions.extractTypes(memberTypeName);
-                        internalTypes.forEach(type => deps[type] = true)
+                        internalTypes.forEach(type => {
+                            deps[type] = true
+                            if (functions.hasMapPairType(type)) {
+                                deps['parse' + type + 'Record'] = true
+                                deps[type + 'Map'] = true
+                            }
+                        })
                     }
                 });
             });

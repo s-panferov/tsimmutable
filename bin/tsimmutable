@@ -13,6 +13,7 @@ var usage = '' +
     '--emitRecords       Shoud emitter emit records? Default: false' + '\n' +
     '--emitMarkers       Shoud emitter emit type markers? Default: false' + '\n' +
     '--emitEmptyRecords  Shoud emitter emit empty default records? Default: false' + '\n' +
+    '--emitTypedMethods  Shoud emitter emit typed methods? Default: false' + '\n' +
     '--defaultEmptyType  Emit empty records with fields initializer by this value. Default: "null"' + '\n'
 
 if (!argv._.length) {
