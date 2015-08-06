@@ -33,7 +33,7 @@
     "immutable": "^3.7.4",
     "lodash": "^3.10.0",
     "minimist": "^1.1.2",
-    "typescript": "^1.6.0-dev.20150802"
+    "typescript": "1.6.0-dev.20150806"
   },
   "devDependencies": {
     "awesome-typescript-loader": "^0.10.0",
