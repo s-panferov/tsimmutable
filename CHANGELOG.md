@@ -1,3 +1,13 @@
+<a name="0.2.6"></a>
+## 0.2.6 (2015-08-06)
+
+
+### Features
+
+* ***:** impl deps ([d45d341](https://github.com/s-panferov/tsimmutable/commit/d45d341))
+
+
+
 <a name="0.2.5"></a>
 ## 0.2.5 (2015-08-04)
 
