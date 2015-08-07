@@ -1,5 +1,5 @@
-<% if (emitRecords) { -%>
-    <%= member.name.text %><%= member.questionToken ? '?' : '' %>: <%- this.typeMap(member) %>
+<% if (isRecord) { -%>
+    <%= member.name.text %>: <%- this.typeMap(member, isRecord) %>
 <% } -%>
-get(key: '<%= member.name.text %>', defaultValue?: <%- this.typeMap(member) %>): <%- this.typeMap(member) %>
-set(key: '<%= member.name.text %>', value: <%- this.typeMap(member) %>): <%= iface.name.text %>Map
+get(key: '<%= member.name.text %>', defaultValue?: <%- this.typeMap(member, isRecord) %>): <%- this.typeMap(member, isRecord) %>
+set(key: '<%= member.name.text %>', value: <%- this.typeMap(member, isRecord) %>): <%= className %>

@@ -36,7 +36,7 @@ function isPlainObj(value) {
 }
 
 <% ifaces.forEach(function(iface) { -%>
-    <%- include('interface', { iface: iface, ifaceName: iface.name.text }) %>
+    <%- include('model', { iface: iface, ifaceName: iface.name.text }) %>
 <% }) -%>
 <% if (emitRecords && emitEmptyRecords) { -%>
     export let allRecords = {

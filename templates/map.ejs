@@ -1,16 +1,19 @@
 /**
  * Map interface for <%= ifaceName %> with specialized getters and setters.
  */
-export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerType %>> {
+<% var className = ifaceName + suffix %>
+export interface <%= className %> extends Immutable.Map<string, <%= indexerType %>> {
+
     <% if (emitMarkers) { -%>
-        <%= ifaceName %>Map: <%= ifaceName %>Map
+        $<%= className %>: <%= className %>
     <% } -%>
 
     <% iface.members.forEach(function(member) { -%>
-        <%- include('member', { iface: iface, member: member }) %>
+        <%- include('member', { iface: iface, member: member, className: className }) %>
     <% }) -%>
+
     get(key: string, defaultValue?: any): <%= indexerType %>;
-    set(key: string, value: typeof undefined): <%= ifaceName %>Map;
+    set(key: string, value: typeof undefined): <%= className %>;
 
     <% if (emitTypedMethods) { %>
 
@@ -21,13 +24,13 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          * the ES6 collection API.
          * @alias remove
          */
-        delete(key: <%= keyType %>): <%= ifaceName %>Map;
-        remove(key: <%= keyType %>): <%= ifaceName %>Map;
+        delete(key: <%= keyType %>): <%= className %>;
+        remove(key: <%= keyType %>): <%= className %>;
 
         /**
          * Returns a new Map containing no keys or values.
          */
-        clear(): <%= ifaceName %>Map;
+        clear(): <%= className %>;
 
         /**
          * Returns a new Map having updated the value at this `key` with the return
@@ -37,9 +40,9 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          *
          * Equivalent to: `map.set(key, updater(map.get(key, notSetValue)))`.
          */
-        update(updater: (value: <%= ifaceName %>Map) => <%= ifaceName %>Map): <%= ifaceName %>Map;
-        update(key: <%= keyType %>, updater: (value: <%= indexerType %>) => <%= indexerType %>): <%= ifaceName %>Map;
-        update(key: <%= keyType %>, notSetValue: <%= indexerType %>, updater: (value: <%= indexerType %>) => <%= indexerType %>): <%= ifaceName %>Map;
+        update(updater: (value: <%= className %>) => <%= className %>): <%= className %>;
+        update(key: <%= keyType %>, updater: (value: <%= indexerType %>) => <%= indexerType %>): <%= className %>;
+        update(key: <%= keyType %>, notSetValue: <%= indexerType %>, updater: (value: <%= indexerType %>) => <%= indexerType %>): <%= className %>;
 
         /**
          * Returns a new Map resulting from merging the provided Iterables
@@ -58,7 +61,7 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          *     y.merge(x) // { b: 20, a: 10, d: 60, c: 30 }
          *
          */
-        merge(...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]): <%= ifaceName %>Map;
+        merge(...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]): <%= className %>;
         merge(...iterables: {[key: string]: <%= indexerType %>}[]): Immutable.Map<string, <%= indexerType %>>;
 
         /**
@@ -75,7 +78,7 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
         mergeWith(
           merger: (previous?: <%= indexerType %>, next?: <%= indexerType %>, key?: <%= keyType %>) => <%= indexerType %>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeWith(
           merger: (previous?: <%= indexerType %>, next?: <%= indexerType %>, key?: <%= keyType %>) => <%= indexerType %>,
           ...iterables: {[key: string]: <%= indexerType %>}[]
@@ -90,7 +93,7 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          *     x.mergeDeep(y) // {a: { x: 2, y: 10 }, b: { x: 20, y: 5 }, c: { z: 3 } }
          *
          */
-        mergeDeep(...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]): <%= ifaceName %>Map;
+        mergeDeep(...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]): <%= className %>;
         mergeDeep(...iterables: {[key: string]: <%= indexerType %>}[]): Immutable.Map<string, <%= indexerType %>>;
 
         /**
@@ -106,7 +109,7 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
         mergeDeepWith(
           merger: (previous?: <%= indexerType %>, next?: <%= indexerType %>, key?: <%= keyType %>) => <%= indexerType %>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeDeepWith(
           merger: (previous?: <%= indexerType %>, next?: <%= indexerType %>, key?: <%= keyType %>) => <%= indexerType %>,
           ...iterables: {[key: string]: <%= indexerType %>}[]
@@ -119,8 +122,8 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          * Returns a new Map having set `value` at this `keyPath`. If any keys in
          * `keyPath` do not exist, a new immutable Map will be created at that key.
          */
-        setIn(keyPath: Array<any>, value: any): <%= ifaceName %>Map;
-        setIn(KeyPath: Immutable.Iterable<any, any>, value: any): <%= ifaceName %>Map;
+        setIn(keyPath: Array<any>, value: any): <%= className %>;
+        setIn(KeyPath: Immutable.Iterable<any, any>, value: any): <%= className %>;
 
         /**
          * Returns a new Map having removed the value at this `keyPath`. If any keys
@@ -128,10 +131,10 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          *
          * @alias removeIn
          */
-        deleteIn(keyPath: Array<any>): <%= ifaceName %>Map;
-        deleteIn(keyPath: Immutable.Iterable<any, any>): <%= ifaceName %>Map;
-        removeIn(keyPath: Array<any>): <%= ifaceName %>Map;
-        removeIn(keyPath: Immutable.Iterable<any, any>): <%= ifaceName %>Map;
+        deleteIn(keyPath: Array<any>): <%= className %>;
+        deleteIn(keyPath: Immutable.Iterable<any, any>): <%= className %>;
+        removeIn(keyPath: Array<any>): <%= className %>;
+        removeIn(keyPath: Immutable.Iterable<any, any>): <%= className %>;
 
         /**
          * Returns a new Map having applied the `updater` to the entry found at the
@@ -157,21 +160,21 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
         updateIn(
           keyPath: Array<any>,
           updater: (value: any) => any
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         updateIn(
           keyPath: Array<any>,
           notSetValue: any,
           updater: (value: any) => any
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         updateIn(
           keyPath: Immutable.Iterable<any, any>,
           updater: (value: any) => any
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         updateIn(
           keyPath: Immutable.Iterable<any, any>,
           notSetValue: any,
           updater: (value: any) => any
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
 
         /**
          * A combination of `updateIn` and `merge`, returning a new Map, but
@@ -185,11 +188,11 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
         mergeIn(
           keyPath: Immutable.Iterable<any, any>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeIn(
           keyPath: Array<any>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeIn(
           keyPath: Array<any>,
           ...iterables: {[key: string]: <%= indexerType %>}[]
@@ -207,11 +210,11 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
         mergeDeepIn(
           keyPath: Immutable.Iterable<any, any>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeDeepIn(
           keyPath: Array<any>,
           ...iterables: Immutable.Iterable<<%= keyType %>, <%= indexerType %>>[]
-        ): <%= ifaceName %>Map;
+        ): <%= className %>;
         mergeDeepIn(
           keyPath: Array<any>,
           ...iterables: {[key: string]: <%= indexerType %>}[]
@@ -244,7 +247,7 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          * `withMutations`! Only `set` and `merge` may be used mutatively.
          *
          */
-        withMutations(mutator: (mutable: <%= ifaceName %>Map) => any): <%= ifaceName %>Map;
+        withMutations(mutator: (mutable: <%= className %>) => any): <%= className %>;
 
         /**
          * Another way to avoid creation of intermediate Immutable maps is to create
@@ -259,66 +262,14 @@ export interface <%= ifaceName %>Map extends Immutable.Map<string, <%= indexerTy
          * Note: Not all methods can be used on a mutable collection or within
          * `withMutations`! Only `set` and `merge` may be used mutatively.
          */
-        asMutable(): <%= ifaceName %>Map;
+        asMutable(): <%= className %>;
 
         /**
          * The yin to `asMutable`'s yang. Because it applies to mutable collections,
          * this operation is *mutable* and returns itself. Once performed, the mutable
          * copy has become immutable and can be safely returned from a function.
          */
-        asImmutable(): <%= ifaceName %>Map;
+        asImmutable(): <%= className %>;
 
     <% } %>
 }
-<% if (emitRecords) { -%>
-
-    /**
-     * Default fields that must be provided in <%= ifaceName %>Record.
-     */
-    export interface <%= ifaceName %>RecordDefaults {
-        <% iface.members.forEach(function(member) { -%>
-            <%= member.name.text %>: <%- this.typeMap(member) %>
-        <% }.bind(this)) -%>
-    }
-
-    /**
-     * Typed <%= ifaceName %>Record constructor.
-     */
-    export let <%= ifaceName %>RecordCtor: RecordCtor<<%= ifaceName %>RecordDefaults, <%= ifaceName %>Map> = Immutable.Record as any;
-
-    /**
-     * Special method to parse <%= ifaceName %>Record with all the dependencies.
-     */
-    export function parse<%= ifaceName %>Record(value: <%= ifaceName %>, deps: any): <%= ifaceName %>Map {
-        var recordWalker = function(value, key) {
-            switch(true) {
-                <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
-                    case key == '<%= depFieldName %>':
-                       <% if (this.isArrayType(depType)) { -%>
-                            return Immutable.List(value.map((item) => {
-                                return parse<%= this.sanitizeTypeName(depType) %>Record(item, deps);
-                            }));
-                       <%} else {-%>
-                            return parse<%= depType %>Record(value, deps);
-                       <% } -%>
-                <% }.bind(this)) %>
-                default: return fromJSDefault(value);
-            }
-        };
-
-        var result: any = {};
-        for (var k in value) {
-            if (value.hasOwnProperty) {
-                result[k] = recordWalker(value[k], k);
-            }
-        }
-
-        return new deps.<%= ifaceName %>Record(result);
-    }
-
-    export class <%= ifaceName %>Record extends <%= ifaceName %>RecordCtor({
-        <% iface.members.forEach(function(member) { -%>
-            <%= member.name.text %>: <%- this.initializer(member) %>,
-        <% }.bind(this)) -%>
-    }) { }
-<% } -%>

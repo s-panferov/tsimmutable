@@ -67,6 +67,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         flatImports,
         keyType: "string",
         indexerType: 'any',
+        emitMaps: true,
         emitRecords: false,
         emitMarkers: false,
         emitEmptyRecords: false,
@@ -74,6 +75,8 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         defaultEmptyType: 'null',
         exportDeps: []
     };
+
+    console.log(extOptions)
 
     _.assign(options, extOptions);
 
@@ -99,17 +102,21 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         getImportedImmutableTypes() {
             return Object.keys(flatImports).filter(item => /^[A-Z].*Map$/.test(item)).map(item => item.replace(/Map$/, ''))
         },
-        typeMap: (member) => {
+        typeMap: (member, isRecord = false) => {
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
             let isArrayType = functions.isArrayType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
 
-            if (isLocalType || functions.hasMapPairType(sanitizedTypeName)) {
+            let hasMapPairType = functions.hasMapPairType(sanitizedTypeName);
+            let hasRecordPairType = functions.hasRecordPairType(sanitizedTypeName);
+
+            if (isLocalType || hasMapPairType || hasRecordPairType) {
+                let suffix = (isRecord && (isLocalType || hasRecordPairType)) ? 'Record' : 'Map';
                 if (isArrayType) {
-                    return `Immutable.List<${sanitizedTypeName}Map>`
+                    return `Immutable.List<${sanitizedTypeName}${suffix}>`
                 } else {
-                    return `${typeName}Map`
+                    return `${typeName}${suffix}`
                 }
             } else {
                 return typeName
@@ -150,11 +157,14 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             let isArrayType = functions.isArrayType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
 
+            let hasRecordPairType = functions.hasRecordPairType(sanitizedTypeName);
+            let suffix = (isLocalType || hasRecordPairType) ? 'Record' : 'Map';
+
             if (isLocalType) {
                 if (isArrayType) {
-                    return `Immutable.List<${sanitizedTypeName}Map>()`;
+                    return `Immutable.List<${sanitizedTypeName}${suffix}>()`;
                 } else if (!member.questionToken) {
-                    return `new ${typeName}Record()`;
+                    return `new ${typeName}${suffix}()`;
                 } else {
                     return options.defaultEmptyType;
                 }
@@ -175,8 +185,10 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                         internalTypes.forEach(type => {
                             deps[type] = true
                             if (functions.hasMapPairType(type)) {
-                                deps['parse' + type + 'Record'] = true
                                 deps[type + 'Map'] = true
+                            }
+                            if (functions.hasRecordPairType(type)) {
+                                deps[type + 'Record'] = true
                             }
                         })
                     }

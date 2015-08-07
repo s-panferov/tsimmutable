@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 var generate = require('../dist/index').generate;
-var argv = require('minimist')(process.argv.slice(2));
+var argv = require('minimist')(process.argv.slice(2), {boolean: true});
 var fs = require('fs');
 var pkg = require('../package.json');
 var usage = '' +

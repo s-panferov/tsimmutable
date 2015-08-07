@@ -1,0 +1,61 @@
+<% if (emitMaps) { -%>
+    <%- include('map', { iface: iface, isRecord: false, suffix: 'Map' }) %>
+<% } %>
+
+<% if (emitRecords) { -%>
+    <%- include('map', { iface: iface, isRecord: true, suffix: 'RecordShape' }) %>
+
+    /**
+     * Default fields that must be provided in <%= ifaceName %>Record.
+     */
+    export interface <%= ifaceName %>RecordDefaults {
+        <% iface.members.forEach(function(member) { -%>
+            <%= member.name.text %>: <%- this.typeMap(member, true) %>
+        <% }.bind(this)) -%>
+    }
+
+    /**
+     * Typed <%= ifaceName %>Record constructor.
+     */
+    export let <%= ifaceName %>RecordCtor: RecordCtor<<%= ifaceName %>RecordDefaults, <%= ifaceName %>RecordShape> = Immutable.Record as any;
+
+    /**
+     * Special method to parse <%= ifaceName %>Record with all the dependencies.
+     */
+    export function parse<%= ifaceName %>Record(value: <%= ifaceName %>, deps: any): <%= ifaceName %>RecordShape {
+        var recordWalker = function(value, key) {
+            switch(true) {
+                <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
+                    case key == '<%= depFieldName %>':
+                       <% if (this.isArrayType(depType)) { -%>
+                            return Immutable.List(value.map((item) => {
+                                return deps.<%= this.sanitizeTypeName(depType) %>Record.fromJS(item, deps);
+                            }));
+                       <%} else {-%>
+                            return deps.<%= depType %>Record.fromJS(value, deps);
+                       <% } -%>
+                <% }.bind(this)) %>
+                default: return fromJSDefault(value);
+            }
+        };
+
+        var result: any = {};
+        for (var k in value) {
+            if (value.hasOwnProperty) {
+                result[k] = recordWalker(value[k], k);
+            }
+        }
+
+        return new deps.<%= ifaceName %>Record(result);
+    }
+
+    export class <%= ifaceName %>Record extends <%= ifaceName %>RecordCtor({
+        <% iface.members.forEach(function(member) { -%>
+            <%= member.name.text %>: <%- this.initializer(member) %>,
+        <% }.bind(this)) -%>
+    }) {
+        static fromJS(value: <%= ifaceName %>, deps: any): <%= ifaceName %>Record {
+            return parse<%= ifaceName %>Record(value, deps)
+        }
+    }
+<% } -%>
