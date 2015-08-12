@@ -1,3 +1,13 @@
+<a name="0.3.1"></a>
+## 0.3.1 (2015-08-12)
+
+
+### Features
+
+* ***:** support primitive lists; use Record without map ([2728d31](https://github.com/s-panferov/tsimmutable/commit/2728d31))
+
+
+
 <a name="0.2.7"></a>
 ## 0.2.7 (2015-08-06)
 
