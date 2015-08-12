@@ -119,7 +119,11 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                     return `${typeName}${suffix}`
                 }
             } else {
-                return typeName
+                if (isArrayType) {
+                    return `Immutable.List<${sanitizedTypeName}>`
+                } else {
+                    return `${typeName}`
+                }
             }
         },
         deps: (ifaceName: string, acc = {}) => {
@@ -144,7 +148,9 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             iface.members.forEach((member) => {
                 let memberTypeName = functions.type(member);
                 let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
-                if (functions.isLocalType(sanitizedTypeName) || functions.hasMapPairType(sanitizedTypeName)) {
+                if (functions.isLocalType(sanitizedTypeName)
+                    || functions.hasMapPairType(sanitizedTypeName)
+                    || functions.hasRecordPairType(sanitizedTypeName)) {
                     acc[member.name.text] = memberTypeName
                 }
             });

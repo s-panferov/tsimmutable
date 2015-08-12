@@ -271,5 +271,7 @@ export interface <%= className %> extends Immutable.Map<string, <%= indexerType 
          */
         asImmutable(): <%= className %>;
 
+        toJS(): <%= iface.name.text %>
+
     <% } %>
 }
