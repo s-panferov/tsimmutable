@@ -35,7 +35,10 @@ export interface ExternalOptions {
     emitRecords?: boolean,
     emitMarkers?: boolean,
     emitEmptyRecords?: boolean,
-    defaultEmptyType?: string
+    defaultEmptyType?: string,
+    recordSuffix?: string,
+    mapSuffix?: string,
+    dictType?: string
 }
 
 export function generate(fileName: string, text: string, extOptions: ExternalOptions) {
@@ -73,10 +76,11 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         emitEmptyRecords: false,
         emitTypedMethods: false,
         defaultEmptyType: 'null',
+        mapSuffix: 'Map',
+        recordSuffix: 'Record',
+        dictType: 'Dictionary',
         exportDeps: []
     };
-
-    console.log(extOptions)
 
     _.assign(options, extOptions);
 
@@ -90,14 +94,22 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         isArrayType(typeName: string) {
             return typeName.indexOf('[]') !== -1;
         },
+        isDictionaryType(typeName: string) {
+            return typeName.indexOf(options.dictType) !== -1;
+        },
         sanitizeTypeName(typeName: string) {
-            return typeName.replace(/\[\]$/, '')
+            let arrayRegex = /\[\]$/;
+            if (typeName.indexOf('<') !== -1) {
+                return typeName.match(/<(.*?)>/)[1].replace(arrayRegex, '');
+            } else {
+                return typeName.replace(arrayRegex, '')
+            }
         },
         hasMapPairType(typeName: string): boolean {
-            return flatImports[typeName + 'Map'];
+            return flatImports[typeName + options.mapSuffix];
         },
         hasRecordPairType(typeName: string): boolean {
-            return flatImports[typeName + 'Record'];
+            return flatImports[typeName + options.recordSuffix];
         },
         getImportedImmutableTypes() {
             return Object.keys(flatImports).filter(item => /^[A-Z].*Map$/.test(item)).map(item => item.replace(/Map$/, ''))
@@ -106,15 +118,22 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
             let isArrayType = functions.isArrayType(typeName);
+            let isDictionaryType = functions.isDictionaryType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
+
+            console.log(typeName, isDictionaryType, sanitizedTypeName)
 
             let hasMapPairType = functions.hasMapPairType(sanitizedTypeName);
             let hasRecordPairType = functions.hasRecordPairType(sanitizedTypeName);
 
             if (isLocalType || hasMapPairType || hasRecordPairType) {
-                let suffix = (isRecord && (isLocalType || hasRecordPairType)) ? 'Record' : 'Map';
+                let suffix = (isRecord && (isLocalType || hasRecordPairType))
+                    ? options.recordSuffix
+                    : options.mapSuffix;
                 if (isArrayType) {
                     return `Immutable.List<${sanitizedTypeName}${suffix}>`
+                } else if (isDictionaryType) {
+                    return `Immutable.Map<string, ${sanitizedTypeName}${suffix}>`
                 } else {
                     return `${typeName}${suffix}`
                 }
@@ -161,14 +180,19 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
             let isArrayType = functions.isArrayType(typeName);
+            let isDictionaryType = functions.isDictionaryType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
 
             let hasRecordPairType = functions.hasRecordPairType(sanitizedTypeName);
-            let suffix = (isLocalType || hasRecordPairType) ? 'Record' : 'Map';
+            let suffix = (isLocalType || hasRecordPairType)
+                ? options.recordSuffix
+                : options.mapSuffix;
 
             if (isLocalType) {
                 if (isArrayType) {
                     return `Immutable.List<${sanitizedTypeName}${suffix}>()`;
+                } else if (isDictionaryType) {
+                    return `Immutable.Map<string,${sanitizedTypeName}${suffix}>()`;
                 } else if (!member.questionToken) {
                     return `new ${typeName}${suffix}()`;
                 } else {
@@ -191,10 +215,10 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                         internalTypes.forEach(type => {
                             deps[type] = true
                             if (functions.hasMapPairType(type)) {
-                                deps[type + 'Map'] = true
+                                deps[type + options.mapSuffix] = true
                             }
                             if (functions.hasRecordPairType(type)) {
-                                deps[type + 'Record'] = true
+                                deps[type + options.recordSuffix] = true
                             }
                         })
                     }

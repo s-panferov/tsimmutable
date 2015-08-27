@@ -41,7 +41,7 @@ function isPlainObj(value) {
 <% if (emitRecords && emitEmptyRecords) { -%>
     export let allRecords = {
         <% ifaces.forEach(function(iface) { -%>
-            <%= iface.name.text %>Record,
+            <%= iface.name.text %><%= recordSuffix %>,
         <% }) -%>
     }
 <% } -%>

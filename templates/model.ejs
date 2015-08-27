@@ -1,5 +1,5 @@
 <% if (emitMaps) { -%>
-    <%- include('map', { iface: iface, isRecord: false, suffix: 'Map' }) %>
+    <%- include('map', { iface: iface, isRecord: false, suffix: mapSuffix }) %>
 <% } %>
 
 <% if (emitRecords) { -%>
@@ -22,17 +22,25 @@
     /**
      * Special method to parse <%= ifaceName %>Record with all the dependencies.
      */
-    export function parse<%= ifaceName %>Record(value: <%= ifaceName %>, deps: any): <%= ifaceName %>RecordShape {
+    export function parse<%= ifaceName %><%= recordSuffix %>(value: <%= ifaceName %>, deps: any): <%= ifaceName %>RecordShape {
         var recordWalker = function(value, key) {
             switch(true) {
                 <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
                     case key == '<%= depFieldName %>':
                        <% if (this.isArrayType(depType)) { -%>
                             return Immutable.List(value.map((item) => {
-                                return deps.<%= this.sanitizeTypeName(depType) %>Record.fromJS(item, deps);
+                                return deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(item, deps);
                             }));
+                       <%} else if (this.isDictionaryType(depType)) { -%>
+                           let map = {};
+                           for (let key in value) {
+                               if (value.hasOwnProperty(key)) {
+                                   map[key] = deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(value[key], deps);
+                               }
+                           }
+                           return Immutable.Map(map);
                        <%} else {-%>
-                            return deps.<%= depType %>Record.fromJS(value, deps);
+                            return deps.<%= depType %><%= recordSuffix %>.fromJS(value, deps);
                        <% } -%>
                 <% }.bind(this)) %>
                 default: return fromJSDefault(value);
@@ -46,16 +54,16 @@
             }
         }
 
-        return new deps.<%= ifaceName %>Record(result);
+        return new deps.<%= ifaceName %><%= recordSuffix %>(result);
     }
 
-    export class <%= ifaceName %>Record extends <%= ifaceName %>RecordCtor({
+    export class <%= ifaceName %><%= recordSuffix %> extends <%= ifaceName %>RecordCtor({
         <% iface.members.forEach(function(member) { -%>
             <%= member.name.text %>: <%- this.initializer(member) %>,
         <% }.bind(this)) -%>
     }) {
-        static fromJS(value: <%= ifaceName %>, deps: any): <%= ifaceName %>Record {
-            return parse<%= ifaceName %>Record(value, deps)
+        static fromJS(value: <%= ifaceName %>, deps: any): <%= ifaceName %><%= recordSuffix %> {
+            return parse<%= ifaceName %><%= recordSuffix %>(value, deps)
         }
     }
 <% } -%>
