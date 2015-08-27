@@ -7,28 +7,9 @@ import * as path from "path";
 import * as _ from 'lodash';
 import { readFileSync } from 'fs';
 import { format } from './formatter';
+import { walker } from './util';
 
 var ejs = require('ejs');
-
-export function walker(sourceFile: ts.SourceFile) {
-    let interfaces = [];
-    let imports = [];
-    let walk = (node: ts.Node) => {
-        switch (node.kind) {
-            case ts.SyntaxKind.InterfaceDeclaration:
-                interfaces.push(node);
-                break;
-            case ts.SyntaxKind.ImportDeclaration:
-                imports.push(node);
-                break;
-        }
-
-        ts.forEachChild(node, walk);
-    }
-
-    walk(sourceFile);
-    return [interfaces, imports];
-}
 
 export interface ExternalOptions {
     indexerType?: string,
@@ -85,18 +66,22 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
     _.assign(options, extOptions);
 
     let functions = {
-        type: (member) => {
+        type(member) {
             return sourceFile.text.slice(member.type.pos + 1, member.type.end)
         },
+
         isLocalType(typeName: string) {
             return  _.any(ifaces, (iface) => iface.name.text == typeName);
         },
+
         isArrayType(typeName: string) {
             return typeName.indexOf('[]') !== -1;
         },
+
         isDictionaryType(typeName: string) {
             return typeName.indexOf(options.dictType) !== -1;
         },
+
         sanitizeTypeName(typeName: string) {
             let arrayRegex = /\[\]$/;
             if (typeName.indexOf('<') !== -1) {
@@ -105,23 +90,25 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                 return typeName.replace(arrayRegex, '')
             }
         },
+
         hasMapPairType(typeName: string): boolean {
             return flatImports[typeName + options.mapSuffix];
         },
+
         hasRecordPairType(typeName: string): boolean {
             return flatImports[typeName + options.recordSuffix];
         },
+
         getImportedImmutableTypes() {
             return Object.keys(flatImports).filter(item => /^[A-Z].*Map$/.test(item)).map(item => item.replace(/Map$/, ''))
         },
+
         typeMap: (member, isRecord = false) => {
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
             let isArrayType = functions.isArrayType(typeName);
             let isDictionaryType = functions.isDictionaryType(typeName);
             let isLocalType = functions.isLocalType(sanitizedTypeName);
-
-            console.log(typeName, isDictionaryType, sanitizedTypeName)
 
             let hasMapPairType = functions.hasMapPairType(sanitizedTypeName);
             let hasRecordPairType = functions.hasRecordPairType(sanitizedTypeName);
@@ -145,6 +132,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                 }
             }
         },
+
         deps: (ifaceName: string, acc = {}) => {
             let iface = _.find(ifaces, (iface) => iface.name.text == ifaceName);
             iface.members.forEach((member) => {
@@ -162,6 +150,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             acc[ifaceName] = true;
             return Object.keys(acc);
         },
+
         ownDeps: (ifaceName: string, acc = {}) => {
             let iface = _.find(ifaces, (iface) => iface.name.text == ifaceName);
             iface.members.forEach((member) => {
@@ -176,6 +165,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
 
             return acc
         },
+
         initializer: (member) => {
             let typeName = functions.type(member);
             let sanitizedTypeName = functions.sanitizeTypeName(typeName);
@@ -202,6 +192,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                 return options.defaultEmptyType;
             }
         },
+
         exportDeps: (): string[] => {
             let deps = {};
 
@@ -227,6 +218,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
 
             return Object.keys(deps);
         },
+
         extractTypes: (typeName: string): string[] => {
             let types = typeName
                 // Extract all type names from the type
@@ -238,6 +230,7 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
                 return [];
             }
         },
+
         forEach: _.forEach
     }
 

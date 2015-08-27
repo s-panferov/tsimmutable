@@ -12,6 +12,17 @@ export {
     <% }) -%>
 };
 
+<% ifaces.forEach(function(iface) { -%>
+    <%- include('model', { iface: iface, ifaceName: iface.name.text }) %>
+<% }) -%>
+<% if (emitRecords && emitEmptyRecords) { -%>
+    export let allRecords = {
+        <% ifaces.forEach(function(iface) { -%>
+            <%= iface.name.text %><%= recordSuffix %>,
+        <% }) -%>
+    }
+<% } -%>
+
 export interface RecordClass<T extends Immutable.Map<string, void>> {
     new (): T;
     new (values: T): T;
@@ -35,13 +46,4 @@ function isPlainObj(value) {
     return value && (value.constructor === Object || value.constructor === undefined);
 }
 
-<% ifaces.forEach(function(iface) { -%>
-    <%- include('model', { iface: iface, ifaceName: iface.name.text }) %>
-<% }) -%>
-<% if (emitRecords && emitEmptyRecords) { -%>
-    export let allRecords = {
-        <% ifaces.forEach(function(iface) { -%>
-            <%= iface.name.text %><%= recordSuffix %>,
-        <% }) -%>
-    }
-<% } -%>
+<%- include('methods') %>

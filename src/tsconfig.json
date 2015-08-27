@@ -24,6 +24,7 @@
     "files": [
         "./formatter.ts",
         "./index.ts",
-        "./plugin.ts"
+        "./plugin.ts",
+        "./util.ts"
     ]
 }
