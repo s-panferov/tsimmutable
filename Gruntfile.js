@@ -8,14 +8,12 @@ module.exports = function(grunt) {
                 options: {
                     compiler: './node_modules/typescript/bin/tsc',
                     module: "commonjs",
-                    fast: 'never',
                     preserveConstEnums: true,
-                    sourceMap: false
+                    sourceMap: true
                 },
-                files: [
-                    { src: ['./src/**/*.ts'], dest: './dist' },
-                    { src: ['./test/**/*.ts'], dest: './test/out' }
-                ]
+                src: './src/**/*.ts',
+                outDir: './dist',
+                watch: ['./src/**/*.ts']
             }
         },
         bump: {

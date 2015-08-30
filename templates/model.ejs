@@ -28,11 +28,14 @@
         var recordWalker = function(value, key) {
             switch(true) {
                 <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
+                    <% var sanitizedTypeName = this.sanitizeTypeName(depType); -%>
+                    <% var modulePath = this.modulePath(sanitizedTypeName); -%>
+                    <% sanitizedTypeName = modulePath ? modulePath.typeName : sanitizedTypeName ; -%>
                     case key == '<%= depFieldName %>':
                        <% if (this.isArrayType(depType)) { -%>
                             if (value != null) {
                                 return Immutable.List(value.map((item) => {
-                                    return deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(item, deps);
+                                    return deps.<%= sanitizedTypeName %><%= recordSuffix %>.fromJS(item, deps);
                                 }));
                             } else {
                                 return undefined;
@@ -43,7 +46,7 @@
                                if (value.hasOwnProperty(key)) {
                                    let val = value[key];
                                    if (val != null) {
-                                       map[key] = deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(val, deps);
+                                       map[key] = deps.<%= sanitizedTypeName %><%= recordSuffix %>.fromJS(value[key], deps);
                                    } else {
                                        map[key] = undefined;
                                    }
@@ -52,7 +55,7 @@
                            return Immutable.Map(map);
                        <%} else {-%>
                             if (value != null) {
-                                return deps.<%= depType %><%= recordSuffix %>.fromJS(value, deps);
+                                return deps.<%= sanitizedTypeName %><%= recordSuffix %>.fromJS(value, deps);
                             } else {
                                 return undefined;
                             }

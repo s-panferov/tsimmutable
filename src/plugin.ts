@@ -1,48 +1,49 @@
-import { generate } from './index';
+import { Scope, ExternalOptions } from './index';
 import { readFileSync, writeFileSync } from 'fs';
 import * as path from 'path';
+
+export interface PluginOptions extends ExternalOptions {
+    files: string[]
+}
 
 export default class TsImmutablePlugin {
     files: string[]
     options: any;
+    scope: Scope;
 
-    constructor(options) {
-      var opt = options || {};
-      this.options = opt;
-      this.files = opt.files ? [].concat(opt.files) : [];
-      this.files = this.files.map(fileName => path.resolve(fileName));
-    }
-
-    generate(fileName: string) {
-        let result = generate(fileName, readFileSync(fileName).toString(), this.options);
-        let resultFileName = fileName.replace(/\.ts$/, `${this.options.suffix || '-i'}.ts`);
-
-        if (this.options.verbose) {
-            console.log(`[tsimmutable]: write ${path.relative(process.cwd(), resultFileName)}`);
+    constructor(options: PluginOptions) {
+        if (typeof options == 'undefined') {
+            options = {} as any;
         }
-        writeFileSync(resultFileName, result);
+        this.options = options;
+        this.files = options.files ? [].concat(options.files) : [];
+        this.files = this.files.map(fileName => path.resolve(fileName));
+
+        this.scope = new Scope(options);
+
+        this.prepareAll();
     }
 
-    generateAll() {
+    prepareAll() {
         this.files.forEach((fileName) => {
-            this.generate(fileName);
+            this.scope.addModule(fileName, readFileSync(fileName).toString());
         })
     }
 
     apply(compiler): void {
         compiler.plugin('run', (compiler, callback) => {
-            this.generateAll();
+            this.scope.writeAll();
             callback();
         });
 
         compiler.plugin('watch-run', (watching, callback) => {
             let mtimes = watching.compiler.watchFileSystem.watcher.mtimes;
             if (!Object.keys(mtimes).length) {
-                this.generateAll()
+                this.scope.writeAll()
             } else {
                 this.files.forEach((fileName) => {
                     if (mtimes.hasOwnProperty(fileName)) {
-                        this.generate(fileName);
+                        this.scope.write(fileName);
                     }
                 });
             }
@@ -51,4 +52,4 @@ export default class TsImmutablePlugin {
     }
 }
 
-module.exports = TsImmutablePlugin
+module.exports = TsImmutablePlugin;

@@ -25,6 +25,15 @@
         "./formatter.ts",
         "./index.ts",
         "./plugin.ts",
+        "./spec/generate.ts",
+        "./spec/models/acl-i.ts",
+        "./spec/models/acl.ts",
+        "./spec/models/enums.ts",
+        "./spec/models/profile-i.ts",
+        "./spec/models/profile.ts",
+        "./spec/models/user-i.ts",
+        "./spec/models/user.ts",
+        "./spec/types.ts",
         "./util.ts"
     ]
 }

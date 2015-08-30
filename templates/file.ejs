@@ -1,16 +1,20 @@
 import * as Immutable from 'immutable';
 
 import {
-    <% exportDeps.forEach(function(typeName) { -%>
+    <% exportDeps[0].forEach(function(typeName) { -%>
         <%= typeName %>,
     <% }) -%>
 } from './<%= importName %>';
 
 export {
-    <% exportDeps.forEach(function(typeName) { -%>
+    <% exportDeps[0].forEach(function(typeName) { -%>
         <%= typeName %>,
     <% }) -%>
 };
+
+<% this.forEach(exportDeps[1], function(modulePath, moduleAlias) { -%>
+    import * as <%= moduleAlias %> from '<%= modulePath %>';
+<% }.bind(this)) -%>
 
 <% ifaces.forEach(function(iface) { -%>
     <%- include('model', { iface: iface, ifaceName: iface.name.text }) %>

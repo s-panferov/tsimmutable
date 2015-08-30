@@ -1,6 +1,6 @@
 import * as ts from "typescript";
 
-export function walker(sourceFile: ts.SourceFile) {
+export function walker(sourceFile: ts.SourceFile): [ts.InterfaceDeclaration[], ts.ImportDeclaration[]] {
     let interfaces = [];
     let imports = [];
     let walk = (node: ts.Node) => {
