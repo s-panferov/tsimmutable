@@ -1,3 +1,14 @@
+<a name="0.3.2"></a>
+## 0.3.2 (2015-09-01)
+
+
+### Features
+
+* ***:** extract ImmutableMethods to make files more compact ([efde6bf](https://github.com/s-panferov/tsimmutable/commit/efde6bf))
+* ***:** impl configurable suffixes ([67bfbb8](https://github.com/s-panferov/tsimmutable/commit/67bfbb8))
+
+
+
 <a name="0.3.1"></a>
 ## 0.3.1 (2015-08-12)
 
