@@ -30,7 +30,7 @@
                 <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
                     case key == '<%= depFieldName %>':
                        <% if (this.isArrayType(depType)) { -%>
-                            if (typeof value !== 'undefined') {
+                            if (value != null) {
                                 return Immutable.List(value.map((item) => {
                                     return deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(item, deps);
                                 }));
@@ -42,7 +42,7 @@
                            for (let key in value) {
                                if (value.hasOwnProperty(key)) {
                                    let val = value[key];
-                                   if (typeof val !== 'undefined') {
+                                   if (val != null) {
                                        map[key] = deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(val, deps);
                                    } else {
                                        map[key] = undefined;
@@ -51,7 +51,7 @@
                            }
                            return Immutable.Map(map);
                        <%} else {-%>
-                            if (typeof value !== 'undefined') {
+                            if (value != null) {
                                 return deps.<%= depType %><%= recordSuffix %>.fromJS(value, deps);
                             } else {
                                 return undefined;
