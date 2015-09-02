@@ -67,7 +67,10 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
 
     let functions = {
         type(member) {
-            return sourceFile.text.slice(member.type.pos + 1, member.type.end)
+            if (member.type) {
+                return sourceFile.text.slice(member.type.pos + 1, member.type.end)
+            } else {
+            }
         },
 
         isLocalType(typeName: string) {
@@ -154,12 +157,14 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
         ownDeps: (ifaceName: string, acc = {}) => {
             let iface = _.find(ifaces, (iface) => iface.name.text == ifaceName);
             iface.members.forEach((member) => {
-                let memberTypeName = functions.type(member);
-                let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
-                if (functions.isLocalType(sanitizedTypeName)
-                    || functions.hasMapPairType(sanitizedTypeName)
-                    || functions.hasRecordPairType(sanitizedTypeName)) {
-                    acc[member.name.text] = memberTypeName
+                if (member.type) {
+                    let memberTypeName = functions.type(member);
+                    let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
+                    if (functions.isLocalType(sanitizedTypeName)
+                        || functions.hasMapPairType(sanitizedTypeName)
+                        || functions.hasRecordPairType(sanitizedTypeName)) {
+                        acc[member.name.text] = memberTypeName
+                    }
                 }
             });
 
@@ -199,19 +204,21 @@ export function generate(fileName: string, text: string, extOptions: ExternalOpt
             ifaces.forEach(iface => {
                 deps[iface.name.text] = true;
                 iface.members.forEach((member) => {
-                    let memberTypeName = functions.type(member);
-                    let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
-                    if (!functions.isLocalType(sanitizedTypeName)) {
-                        let internalTypes = functions.extractTypes(memberTypeName);
-                        internalTypes.forEach(type => {
-                            deps[type] = true
-                            if (functions.hasMapPairType(type)) {
-                                deps[type + options.mapSuffix] = true
-                            }
-                            if (functions.hasRecordPairType(type)) {
-                                deps[type + options.recordSuffix] = true
-                            }
-                        })
+                    if (member.type) {
+                        let memberTypeName = functions.type(member);
+                        let sanitizedTypeName = functions.sanitizeTypeName(memberTypeName);
+                        if (!functions.isLocalType(sanitizedTypeName)) {
+                            let internalTypes = functions.extractTypes(memberTypeName);
+                            internalTypes.forEach(type => {
+                                deps[type] = true
+                                if (functions.hasMapPairType(type)) {
+                                    deps[type + options.mapSuffix] = true
+                                }
+                                if (functions.hasRecordPairType(type)) {
+                                    deps[type + options.recordSuffix] = true
+                                }
+                            })
+                        }
                     }
                 });
             });

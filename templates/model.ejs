@@ -10,7 +10,9 @@
      */
     export interface <%= ifaceName %>RecordDefaults {
         <% iface.members.forEach(function(member) { -%>
-            <%= member.name.text %>: <%- this.typeMap(member, true) %>
+            <% if (member.type) { -%>
+                <%= member.name.text %>: <%- this.typeMap(member, true) %>
+            <% } -%>
         <% }.bind(this)) -%>
     }
 
@@ -28,19 +30,32 @@
                 <% this.forEach(this.ownDeps(ifaceName), function(depType, depFieldName) { %>
                     case key == '<%= depFieldName %>':
                        <% if (this.isArrayType(depType)) { -%>
-                            return Immutable.List(value.map((item) => {
-                                return deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(item, deps);
-                            }));
+                            if (typeof value !== 'undefined') {
+                                return Immutable.List(value.map((item) => {
+                                    return deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(item, deps);
+                                }));
+                            } else {
+                                return undefined;
+                            }
                        <%} else if (this.isDictionaryType(depType)) { -%>
                            let map = {};
                            for (let key in value) {
                                if (value.hasOwnProperty(key)) {
-                                   map[key] = deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(value[key], deps);
+                                   let val = value[key];
+                                   if (typeof val !== 'undefined') {
+                                       map[key] = deps.<%= this.sanitizeTypeName(depType) %><%= recordSuffix %>.fromJS(val, deps);
+                                   } else {
+                                       map[key] = undefined;
+                                   }
                                }
                            }
                            return Immutable.Map(map);
                        <%} else {-%>
-                            return deps.<%= depType %><%= recordSuffix %>.fromJS(value, deps);
+                            if (typeof value !== 'undefined') {
+                                return deps.<%= depType %><%= recordSuffix %>.fromJS(value, deps);
+                            } else {
+                                return undefined;
+                            }
                        <% } -%>
                 <% }.bind(this)) %>
                 default: return fromJSDefault(value);
@@ -59,7 +74,9 @@
 
     export class <%= ifaceName %><%= recordSuffix %> extends <%= ifaceName %>RecordCtor({
         <% iface.members.forEach(function(member) { -%>
-            <%= member.name.text %>: <%- this.initializer(member) %>,
+            <% if (member.type) { -%>
+                <%= member.name.text %>: <%- this.initializer(member) %>,
+            <% } -%>
         <% }.bind(this)) -%>
     }) {
         static fromJS(value: <%= ifaceName %>, deps: any): <%= ifaceName %><%= recordSuffix %> {

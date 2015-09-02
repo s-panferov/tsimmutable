@@ -9,7 +9,9 @@ export interface <%= className %> extends ImmutableMethods<<%= keyType %>, <%= i
     <% } -%>
 
     <% iface.members.forEach(function(member) { -%>
-        <%- include('member', { iface: iface, member: member, className: className }) %>
+        <% if (member.type) { -%>
+            <%- include('member', { iface: iface, member: member, className: className }) %>
+        <% } -%>
     <% }) -%>
 
     get(key: string, defaultValue?: any): <%= indexerType %>;
