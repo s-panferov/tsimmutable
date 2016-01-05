@@ -33,10 +33,10 @@ export interface User {
 Compile it:
 
 ```
-./node_modules/.bin/tsimmutable models.ts --out=models-imm.ts --indexerType=void --emitRecords --emitMarkers --emitEmptyRecords
+./node_modules/.bin/tsimmutable models.ts --out=models-i.ts --indexerType=void --emitRecords --emitMarkers --emitEmptyRecords
 ```
 
-See the [output](https://github.com/s-panferov/tsimmutable/blob/master/test/models-imm.ts).
+See the [output](https://github.com/s-panferov/tsimmutable/blob/master/test/models-i.ts).
 
 ## Options
 
