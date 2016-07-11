@@ -32,7 +32,7 @@ export interface RecordCtor<R, T extends Immutable.Map<string, any>> {
     (defaultValues: T | R, name?: string): RecordClass<T>
 }
 
-function fromJSDefault(json) {
+function fromJSDefault(json: any) {
     if (Array.isArray(json)) {
         return (Immutable.Seq as any).Indexed(json).map(fromJSDefault).toList();
     }
@@ -42,7 +42,7 @@ function fromJSDefault(json) {
     return json;
 }
 
-function isPlainObj(value) {
+function isPlainObj(value: any) {
     return value && (value.constructor === Object || value.constructor === undefined);
 }
 
